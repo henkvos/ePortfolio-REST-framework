@@ -28,5 +28,5 @@ class Citizenship(TenantModel):
     country =  models.ForeignKey(Country)
     
     def __unicode__(self):
-        return u'%s: %s' % (self.citizen_id, self.person.name_inverted)
+        return u'%s: %s' % (self.citizen_id, self.person.name_inverted())
     

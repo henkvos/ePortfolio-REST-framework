@@ -1,9 +1,14 @@
 from django.db import models
-from auth.models import TenantModel, AuthoringMixin
+from django.contrib.auth.models import User
+from auth.models import TenantModel, AuthoringMixin, OnlineIdentityProvider
 from geo.models import Country
 from utils.fields import UUIDField
 import utils.audit as audit
 from django.utils.translation import ugettext_lazy as _
+
+def determine_upload_folder(instance, filename):
+    return '/'.join([settings.BASE_UPLOAD_FOLDER, str(instance.guid), filename])
+    pass
 
 class Person(TenantModel, AuthoringMixin):
     #leap2a spec: 0=not known, 1=male, 2=female, 9=not specified
@@ -29,7 +34,7 @@ class Person(TenantModel, AuthoringMixin):
     place_of_birth = models.CharField(max_length=255, blank=True, null=True)
     country_of_birth = models.ForeignKey(Country, null=True, blank=True, related_name="country_of_birth")
     country_of_origin = models.ForeignKey(Country, null=True, blank=True, related_name="country_of_origin") #used in NEN NTA 2035: land van herkomst ivm immigratie
-    profile_picture = models.ImageField(blank=True, null=True, upload_to="/")
+    profile_picture = models.ImageField(blank=True, null=True, upload_to=determine_upload_folder)
     marital_status = models.CharField(max_length=255, blank=True, null=True)
     
     history = audit.AuditTrail(show_in_admin=True)
@@ -48,8 +53,24 @@ class Person(TenantModel, AuthoringMixin):
         return self.legal_family_name + ', ' + self.preferred_given_name + ( (' ' + self.middle_name) if self.middle_name else '')
     
     class Meta:
-        verbose_name_plural = "Person"
-        ordering = ['legal_family_name', 'preferred_given_name']
+        verbose_name_plural = "Persons"
+        #ordering = ['legal_family_name', 'preferred_given_name']
+        
+
+class OnlineIdentity(TenantModel):
+    provider = models.ForeignKey(OnlineIdentityProvider)
+    user = models.ForeignKey(User, null=True, blank=True)
+    person = models.ForeignKey(Person, null=True, blank=True)
+    identifier = models.URLField(verify_exists=False, max_length=255)
+    access_tokens = models.TextField(blank=True, null=True)
+    page_url = models.URLField(blank=True, verify_exists=False)
+    profile_pic_url = models.URLField(blank=True, verify_exists=False)
+    
+    def __unicode__(self):
+        return u'%s ( %s )' % (self.user.name, self.provider.name)
+    
+    class Meta:
+        verbose_name_plural = "Online Identities"
         
 
 

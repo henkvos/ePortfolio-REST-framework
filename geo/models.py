@@ -1,4 +1,6 @@
 from django.db import models
+from auth.models import *
+
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
@@ -37,3 +39,30 @@ class CountrySubdivision(models.Model):
     
     def __unicode__(self):
         return u'%s: %s' % (self.iso_3166_2, self.name)
+    
+from persons.models import Person
+    
+class Address(TenantModel):
+    TYPE_CHOICES = (
+        ('B', _('Business')),
+        ('P', _('Private')),
+    )
+    address_line = models.CharField(max_length=255)
+    zipcode = models.CharField(max_length=64, null=True, blank=True)
+    city = models.CharField(max_length=255)
+    country = models.ForeignKey(Country)
+    country_subdivision = models.ForeignKey(CountrySubdivision, null=True, blank=True)
+    person = models.ForeignKey(Person)
+    lat = models.FloatField(null=True, blank=True)
+    long = models.FloatField(null=True, blank=True)
+    type = models.CharField(max_length=2, choices=TYPE_CHOICES, blank=True, null=True, default='P')
+    is_default = models.BooleanField()
+    is_correspondence = models.BooleanField()
+    is_visit = models.BooleanField()
+    
+    def __unicode__(self):
+        return u'%s %s %s' % (self.address_line, self.zipcode, self.city)
+ 
+    class Meta:
+        verbose_name_plural = "Addresses"
+    

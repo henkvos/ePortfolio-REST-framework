@@ -61,23 +61,8 @@ class OnlineIdentityProvider(models.Model):
     
     def __unicode__(self):
         return u'%s ( %s )' % (self.name, self.id)
-    
-from persons.models import Person
 
-class OnlineIdentity(TenantModel):
-    provider = models.ForeignKey(OnlineIdentityProvider)
-    user = models.ForeignKey(User, null=True, blank=True)
-    person = models.ForeignKey(Person, null=True, blank=True)
-    identifier = models.URLField(verify_exists=False, max_length=255)
-    access_tokens = models.TextField(blank=True, null=True)
-    page_url = models.URLField(blank=True, verify_exists=False)
-    profile_pic_url = models.URLField(blank=True, verify_exists=False)
-    
-    def __unicode__(self):
-        return u'%s ( %s )' % (self.user.name, self.provider.name)
-    
-    class Meta:
-        verbose_name_plural = "Online Identities"
+
 
 
 
