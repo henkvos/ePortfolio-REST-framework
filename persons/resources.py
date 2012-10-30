@@ -6,29 +6,28 @@ from persons.models import Person
 
 class PersonResource(ListDetailsResource):
     model = Person
-    list_fields = ('guid', 
+    list_fields = ('uuid', 
                    'url',
                    'full_name'
                    )
-    detail_fields = ('guid',
+    detail_fields = ('uuid',
                      #'tenant',
                      'legal_family_name',
                      'legal_given_names',
                      'gender',
                      'marital_status',
-                     #'url',
                      'portfolios',
                      #('country_of_birth',('__unicode__',)),
                      
                      )
     
     def portfolios(self, instance):
-        ports = Portfolio.objects.filter(person=instance.guid)
+        ports = Portfolio.objects.filter(person=instance.uuid)
         portlist = []
         for port in ports:
             portdict = {}
-            portdict['guid'] = port.guid
-            portdict['url'] = reverse('Portfolio', kwargs={'guid':port.guid})
+            portdict['uuid'] = port.uuid
+            portdict['url'] = reverse('Portfolio-Detail', kwargs={'uuid':port.uuid})
             portlist.append(portdict)
             
         return portlist

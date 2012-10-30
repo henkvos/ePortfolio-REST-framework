@@ -19,7 +19,7 @@ class Person(TenantModel, AuthoringMixin):
         ('9', _('Not Specified')),
     )
     
-    guid = UUIDField(auto=True, primary_key=True)
+    uuid = UUIDField(auto=True, primary_key=True, db_column='person_id')
     legal_family_name = models.CharField(max_length=255)
     legal_given_names = models.CharField(max_length=255, null=True, blank=True)
     preferred_family_name = models.CharField(max_length=255, null=True, blank=True)
@@ -36,8 +36,8 @@ class Person(TenantModel, AuthoringMixin):
     country_of_origin = models.ForeignKey(Country, null=True, blank=True, related_name="country_of_origin") #used in NEN NTA 2035: land van herkomst ivm immigratie
     profile_picture = models.ImageField(blank=True, null=True, upload_to=determine_upload_folder)
     marital_status = models.CharField(max_length=255, blank=True, null=True)
-    
-    history = audit.AuditTrail(show_in_admin=True)
+    user = models.ForeignKey(User, null=True, blank=True)
+    #history = audit.AuditTrail(show_in_admin=True)
 
     def __unicode__(self):
         return u'%s, %s %s' % (self.legal_family_name, self.preferred_given_name, self.middle_name)
@@ -58,6 +58,7 @@ class Person(TenantModel, AuthoringMixin):
         
 
 class OnlineIdentity(TenantModel):
+    uuid = UUIDField(auto=True, primary_key=True, db_column='onlineidentity_id')
     provider = models.ForeignKey(OnlineIdentityProvider)
     user = models.ForeignKey(User, null=True, blank=True)
     person = models.ForeignKey(Person, null=True, blank=True)

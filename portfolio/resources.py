@@ -1,53 +1,114 @@
 from django.core.urlresolvers import reverse
 from djangorestframework.resources import ModelResource, Resource
 from api.resources import ListDetailsResource
-from portfolio.models import Portfolio, Education
+from portfolio.models import Portfolio, Education, Work, Interest, Affiliation, Product, Artefact
 from persons.models import Person
+
 
 
 class PortfolioResource(ListDetailsResource):
     model = Portfolio
-    list_fields = ('guid', 
-              ('person',('guid', 'full_name',)),
+    list_fields = ('uuid', 
+                   'person',
               'status',
               'url',)
-    detail_fields = ('guid', 
-              #('person',('guid', 'full_name', 'person_details')), 
+    detail_fields = ('uuid',
               'person',
-              ('initiator',('username',)),
+              ('initiator',('username','id')),
               'status',
-              ('work',('pk' 'job_title')),
+              'work',
               'education',
-              ('interests',('pk' 'short_description')),
-              ('affiliations',('pk', 'type', 'short_description')),
+              'interests',
+              'affiliations'
               )
-
+    
     def education(self, instance):
-        return reverse('Education', kwargs={'portfolio':instance.guid})
+        qlist = Education.objects.filter(portfolio=instance.uuid)
+        rlist = []
+        for item in qlist:
+            rdict = {}
+            rdict['uuid'] = item.uuid
+            rdict['url'] = reverse('Education-Detail', kwargs={'portfolio':instance.uuid, 'uuid':item.uuid})
+            rdict['title'] = item.title
+            rlist.append(rdict)
 
+        return rlist
+    
+    def work(self, instance):
+        qlist = Work.objects.filter(portfolio=instance.uuid)
+        rlist = []
+        for item in qlist:
+            rdict = {}
+            rdict['uuid'] = item.uuid
+            rdict['url'] = reverse('Work-Detail', kwargs={'portfolio':instance.uuid, 'uuid':item.uuid})
+            rdict['title'] = item.title
+            rlist.append(rdict)
+
+        return rlist
+    
     
     def person(self, instance):
-        p = Person.objects.get(guid=instance.person.guid)
+        p = Person.objects.get(uuid=instance.person.uuid)
         pdict = {}
-        pdict['guid'] = p.guid
+        pdict['uuid'] = p.uuid
         pdict['full_name'] = p.full_name
-        pdict['url'] = reverse('Person', kwargs={'guid':p.guid})
+        pdict['url'] = reverse('Person', kwargs={'uuid':p.uuid})
             
         return pdict
     
+
+    def interests(self, instance):
+        qlist = Interest.objects.filter(portfolio=instance.uuid)
+        rlist = []
+        for item in qlist:
+            rdict = {}
+            rdict['uuid'] = item.uuid
+            rdict['url'] = reverse('Interest-Detail', kwargs={'portfolio':instance.uuid, 'uuid':item.uuid})
+            rdict['title'] = item.title
+            rlist.append(rdict)
+
+        return rlist
+    
+    def affiliations(self, instance):
+        qlist = Affiliation.objects.filter(portfolio=instance.uuid)
+        rlist = []
+        for item in qlist:
+            rdict = {}
+            rdict['uuid'] = item.uuid
+            rdict['url'] = reverse('Affiliation-Detail', kwargs={'portfolio':instance.uuid, 'uuid':item.uuid})
+            rdict['title'] = item.title
+            rlist.append(rdict)
+
+        return rlist
+
+    
+    
+    
+'''
+    ports = Portfolio.objects.filter(person=instance.guid)
+        portlist = []
+        for port in ports:
+            portdict = {}
+            portdict['guid'] = port.guid
+            portdict['url'] = reverse('Portfolio', kwargs={'guid':port.guid})
+            portlist.append(portdict)
+            
+        return portlist
+'''
+   
     
     
     
 class EducationResource(ListDetailsResource):
     model = Education
-    list_fields = ('pk',
+    list_fields = ('uuid',
                    'portfolio',
                    'title',
                    'short_description',
-                   'url',
+                   'url'
                    )
     
-    detail_fields = ('pk',
+    detail_fields = ('uuid',
                    'portfolio',
                    'title',
                    'level',
@@ -58,12 +119,112 @@ class EducationResource(ListDetailsResource):
                    'is_current',
                    'is_completed',
                    'is_planned',
-                   'organization_name',
-                   #'url',
+                   'organization_name'
                    )
+    
     def portfolio(self, instance):
-        return reverse('Portfolio', kwargs={'guid':instance.portfolio.guid})
-   
+        pdict = {}
+        pdict['uuid'] = instance.portfolio.uuid
+        pdict['full_name'] = instance.portfolio.person.full_name
+        pdict['url'] = reverse('Portfolio-Detail', kwargs={'uuid':instance.portfolio.uuid})
+        
+        return pdict
     
     
+class WorkResource(ListDetailsResource):
+    model = Work
+    list_fields = ('uuid',
+                   'portfolio',
+                   'title',
+                   'short_description',
+                   'url'
+                   )
+    
+    detail_fields = ('uuid',
+                   'portfolio',
+                   'title',
+                   'function',
+                   'short_description',
+                   'description',
+                   'start_date',
+                   'end_date',
+                   'is_current',
+                   'is_completed',
+                   'is_planned',
+                   'organization_name'
+                   )
+    
+    def portfolio(self, instance):
+        pdict = {}
+        pdict['uuid'] = instance.portfolio.uuid
+        pdict['full_name'] = instance.portfolio.person.full_name
+        pdict['url'] = reverse('Portfolio-Detail', kwargs={'uuid':instance.portfolio.uuid})
+        
+        return pdict
+    
+class InterestResource(ListDetailsResource):
+    model = Interest
+    list_fields = ('uuid',
+                   'portfolio',
+                   'title',
+                   'short_description',
+                   'url'
+                   )
+    
+    detail_fields = ('uuid',
+                   'portfolio',
+                   'title',
+                   'level',
+                   'status',
+                   'short_description',
+                   'description',
+                   'start_date',
+                   'end_date',
+                   'is_current',
+                   'is_completed',
+                   'is_planned',
+                   'organization_name'
+                   )
+    
+    def portfolio(self, instance):
+        pdict = {}
+        pdict['uuid'] = instance.portfolio.uuid
+        pdict['full_name'] = instance.portfolio.person.full_name
+        pdict['url'] = reverse('Portfolio-Detail', kwargs={'uuid':instance.portfolio.uuid})
+        
+        return pdict
+    
+class AffiliationResource(ListDetailsResource):
+    model = Affiliation
+    list_fields = ('uuid',
+                   'portfolio',
+                   'title',
+                   'short_description',
+                   'url'
+                   )
+    
+    detail_fields = ('uuid',
+                   'portfolio',
+                   'title',
+                   'type',
+                   'role',
+                   'short_description',
+                   'description',
+                   'start_date',
+                   'end_date',
+                   'is_current',
+                   'is_completed',
+                   'is_planned',
+                   'organization_name'
+                   )
+    
+    def portfolio(self, instance):
+        pdict = {}
+        pdict['uuid'] = instance.portfolio.uuid
+        pdict['full_name'] = instance.portfolio.person.full_name
+        pdict['url'] = reverse('Portfolio-Detail', kwargs={'uuid':instance.portfolio.uuid})
+        
+        return pdict
+    
+
     

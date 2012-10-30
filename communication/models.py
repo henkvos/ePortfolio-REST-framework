@@ -2,12 +2,14 @@ from django.db import models
 from auth.models import TenantModel
 from persons.models import Person
 from django.utils.translation import ugettext_lazy as _
+from utils.fields import UUIDField
 
 class Phone(TenantModel):
     TYPE_CHOICES = (
         ('B', _('Business')),
         ('P', _('Private')),
     )
+    uuid = UUIDField(auto=True, primary_key=True, db_column='phone_id')
     person = models.ForeignKey(Person, related_name='phones')
     number = models.CharField(max_length=32)
     type = models.CharField(max_length=2, choices=TYPE_CHOICES, blank=True, null=True, default='P')
@@ -22,6 +24,7 @@ class Fax(TenantModel):
         ('B', _('Business')),
         ('P', _('Private')),
     )
+    uuid = UUIDField(auto=True, primary_key=True, db_column='fax_id')
     person = models.ForeignKey(Person, related_name='faxes')
     number = models.CharField(max_length=32)
     type = models.CharField(max_length=2, choices=TYPE_CHOICES, blank=True, null=True, default='P')
@@ -36,6 +39,7 @@ class Email(TenantModel):
         ('B', _('Business')),
         ('P', _('Private')),
     )
+    uuid = UUIDField(auto=True, primary_key=True, db_column='email_id')
     person = models.ForeignKey(Person, related_name='emails')
     address = models.EmailField(max_length=255)
     type = models.CharField(max_length=2, choices=TYPE_CHOICES, blank=True, null=True, default='P')

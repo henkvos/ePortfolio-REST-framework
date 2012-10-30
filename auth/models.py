@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.conf import settings
 import utils.audit as audit
 from django.utils.translation import ugettext_lazy as _
+from utils.fields import UUIDField
 
 MULTI_TENANT = settings.MULTI_TENANT
 
@@ -50,6 +51,14 @@ class TenantModel(models.Model):
         
     class Meta:
         abstract = True
+        
+class UserProfile(models.Model):
+    user = models.ForeignKey(User, unique=True)
+    uuid = UUIDField(auto=True, primary_key=True)
+    login_address = models.EmailField(max_length=255, blank=True, null=True)
+    
+    def __unicode__(self):
+        return u'%s ( %s )' % (self.user.username, self.uuid)
         
         
 class OnlineIdentityProvider(models.Model):

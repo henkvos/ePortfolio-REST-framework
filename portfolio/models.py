@@ -12,7 +12,7 @@ class Portfolio(TenantModel, AuthoringMixin):
         ('0', _('Not Active')),
         ('1', _('Active')),
     )
-    guid = UUIDField(auto=True, primary_key=True)
+    uuid = UUIDField(auto=True, primary_key=True, db_column='portfolio_id')
     status = models.CharField(max_length=2, choices=STATUS_CHOICES, blank=True, null=True, default='1')
     person = models.ForeignKey(Person, related_name="portfolios")
     initiator = models.ForeignKey(User)
@@ -20,7 +20,7 @@ class Portfolio(TenantModel, AuthoringMixin):
     #history = audit.AuditTrail(show_in_admin=True)
     
     def __unicode__(self):
-        return u'%s: %s' % (self.guid, self.person.full_name())
+        return u'%s: %s' % (self.uuid, self.person.full_name())
 
     
 class Activity(TenantModel):
@@ -34,37 +34,47 @@ class Activity(TenantModel):
     organization_name = models.CharField(max_length=255, null=True, blank=True)
     
     def __unicode__(self):
-        return u'%s (%s)' % (self.short_description, self.portfolio.guid)
+        return u'%s (%s)' % (self.short_description, self.portfolio.uuid)
     
     class Meta:
         abstract = True
         
-
-class Affiliation(Activity):
-    portfolio = models.ForeignKey(Portfolio, related_name="affiliations")
-    type = models.CharField(max_length=64)
-    role = models.CharField(max_length=255, blank=True, null=True)
-    
-    def __unicode__(self):
-        return u'%s (%s)' % (self.type, self.portfolio.guid)
-    
     
 class Education(Activity):
+    uuid = UUIDField(auto=True, primary_key=True, db_column='education_id')
     portfolio = models.ForeignKey(Portfolio, related_name="education")
     title = models.CharField(max_length=255)
     level = models.CharField(max_length=255, null=True, blank=True)
     
     def __unicode__(self):
-        return u'%s (%s)' % (self.title, self.portfolio.guid)
+        return u'%s (%s)' % (self.title, self.portfolio.uuid)
     
+    class Meta:
+        verbose_name_plural = 'Education'
+ 
+
+class Affiliation(Activity):
+    uuid = UUIDField(auto=True, primary_key=True, db_column='affiliation_id')
+    portfolio = models.ForeignKey(Portfolio, related_name="affiliations")
+    type = models.CharField(max_length=64)
+    title = models.CharField(max_length=255)
+    role = models.CharField(max_length=255, blank=True, null=True)
+    
+    def __unicode__(self):
+        return u'%s (%s)' % (self.type, self.portfolio.uuid)
+     
     
 class Work(Activity):
+    uuid = UUIDField(auto=True, primary_key=True, db_column='work_id')
     portfolio = models.ForeignKey(Portfolio, related_name="work")
-    job_title = models.CharField(max_length=255)
+    title = models.CharField(max_length=255)
     function = models.CharField(max_length=255, null=True, blank=True)
     
     def __unicode__(self):
-        return u'%s (%s)' % (self.job_title, self.portfolio.guid)
+        return u'%s (%s)' % (self.title, self.portfolio.uuid)
+    
+    class Meta:
+        verbose_name_plural = 'Work'
     
     
 class Interest(Activity):
@@ -72,13 +82,15 @@ class Interest(Activity):
         ('0', _('Not Active')),
         ('1', _('Active')),
     )
+    uuid = UUIDField(auto=True, primary_key=True, db_column='interest_id')
     portfolio = models.ForeignKey(Portfolio, related_name="interests")
+    title = models.CharField(max_length=255)
     level = models.CharField(max_length=255, null=True, blank=True)
     status = models.CharField(max_length=2, choices=STATUS_CHOICES, blank=True, null=True, default='1')
     
     def __unicode__(self):
         return u'%s (%s)' % (self.short_description, self.status)
-        
+  
 
 class Product(TenantModel):
     TYPE_CHOICES = (
@@ -87,6 +99,7 @@ class Product(TenantModel):
         ('pict', _('Picture')),
         ('recl', _('Letter of recommendation')),
     )
+    uuid = UUIDField(auto=True, primary_key=True, db_column='product_id')
     portfolio = models.ForeignKey(Portfolio, related_name="products")
     education = models.ForeignKey(Education, blank=True, null=True)
     work = models.ForeignKey(Work, blank=True, null=True)
@@ -102,11 +115,11 @@ class Product(TenantModel):
 
 
 def determine_upload_folder(instance, filename):
-    return '/'.join([settings.BASE_UPLOAD_FOLDER, str(instance.product.portfolio.guid), str(instance.product), filename])
+    return '/'.join([settings.BASE_UPLOAD_FOLDER, str(instance.product.portfolio.uuid), str(instance.product), filename])
     pass
 
 class Artefact(TenantModel):
-    guid = UUIDField(auto=True, primary_key=True)
+    uuid = UUIDField(auto=True, primary_key=True, db_column='artefact_id')
     attachment = models.FileField(upload_to=determine_upload_folder)
     product = models.ForeignKey(Product)
     mimetype = models.CharField(max_length=255, editable=False)
@@ -117,4 +130,4 @@ class Artefact(TenantModel):
     
     def filename(self):
         return os.path.basename(self.attachment.name)
-
+        

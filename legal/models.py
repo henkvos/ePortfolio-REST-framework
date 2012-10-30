@@ -6,13 +6,14 @@ from utils.fields import UUIDField
 import utils.audit as audit
 from django.utils.translation import ugettext_lazy as _
 
-class Representative(TenantModel):
+class Representation(TenantModel):
     TYPE_CHOICES = (   
         ('1', _('Parent')),
         ('2', _('Guardian')),
         ('3', _('Curator')),
         ('4', _('Plenipotentiary')),
     )
+    uuid = UUIDField(auto=True, primary_key=True, db_column='representation_id')
     type = models.CharField(max_length=2, choices=TYPE_CHOICES, default='1')
     representant = models.ForeignKey(Person, related_name="representant")
     represents = models.ForeignKey(Person)
@@ -22,7 +23,8 @@ class Representative(TenantModel):
         
         
 class Citizenship(TenantModel):
-    citizen_id = models.CharField(max_length=255)
+    uuid = UUIDField(auto=True, primary_key=True, db_column='citizenship_id')
+    citizen_id = models.CharField(max_length=255, null=True, blank=True)
     person = models.ForeignKey(Person)
     passport_number= models.CharField(max_length=255, null=True, blank=True)
     country =  models.ForeignKey(Country)

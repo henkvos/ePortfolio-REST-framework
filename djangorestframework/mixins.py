@@ -513,14 +513,18 @@ class CreateModelMixin(object):
 
         # Copy the dict to keep self.CONTENT intact
         content = dict(self.CONTENT)
+        print content
         m2m_data = {}
 
         for field in model._meta.fields:
+            
             if isinstance(field, ForeignKey) and kwargs.has_key(field.name):
+                print field.name
                 # translate 'related_field' kwargs into 'related_field_id'
-                kwargs[field.name + '_id'] = kwargs[field.name]
+                #kwargs[field.name + '_id'] = kwargs[field.name]
+                kwargs['guid'] = kwargs[field.name]
                 del kwargs[field.name]
-
+            
         for field in model._meta.many_to_many:
             if content.has_key(field.name):
                 m2m_data[field.name] = (

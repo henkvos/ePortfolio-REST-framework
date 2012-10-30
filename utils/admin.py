@@ -25,6 +25,9 @@ class OnlineIdentityProviderAdmin(admin.ModelAdmin):
 class OnlineIdentityAdmin(admin.ModelAdmin):
     model = OnlineIdentity
     
+class UserProfileAdmin(admin.ModelAdmin):
+    model = UserProfile
+    
 #geographic
 
 class LanguageAdmin(admin.ModelAdmin):
@@ -41,93 +44,86 @@ class CountryAdmin(admin.ModelAdmin):
         CountrySubdivisionInline,
     ]
     
-class AddressInline(admin.StackedInline):
+class AddressAdmin(admin.ModelAdmin):
     model = Address
-    extra = 0
+
     
 #communication
 
-class EmailInline(admin.TabularInline):
+class EmailAdmin(admin.ModelAdmin):
     model = Email
-    extra = 0
+
     
-class PhoneInline(admin.TabularInline):
+class PhoneAdmin(admin.ModelAdmin):
     model = Phone
-    extra = 0
+
     
-class FaxInline(admin.TabularInline):
+class FaxAdmin(admin.ModelAdmin):
     model = Fax
-    extra = 0
-    
-    
+
 
 #identity
-class CitizenshipInline(admin.TabularInline):
+class CitizenshipInline(admin.ModelAdmin):
     model = Citizenship
-    extra = 0
-    fields = ('country', 'citizen_id', 'passport_number')
+    
 
 class PersonAdmin(admin.ModelAdmin):
     model = Person
-    inlines = [
-        AddressInline,
-        EmailInline,
-        PhoneInline,
-        FaxInline,       
-        CitizenshipInline,
-    ]
+   
     #fields = ('last_name', 'first_name', 'middle_name')
     
-class RepresentativeAdmin(admin.ModelAdmin):
-    model = Representative
+class RepresentationAdmin(admin.ModelAdmin):
+    model = Representation
     
     
-class EducationInline(admin.StackedInline):
+class EducationAdmin(admin.ModelAdmin):
     model = Education
-    extra = 0
     
-class WorkInline(admin.StackedInline):
+
+class WorkAdmin(admin.ModelAdmin):
     model = Work
-    extra = 0
-    
-class InterestInline(admin.StackedInline):
+
+
+class InterestAdmin(admin.ModelAdmin):
     model = Interest
-    extra = 0
+
     
-class AffiliationInline(admin.StackedInline):
+class AffiliationAdmin(admin.ModelAdmin):
     model = Affiliation
-    extra = 0
+
     
 class PortfolioAdmin(admin.ModelAdmin):
     model = Portfolio
-    inlines = [
-        EducationInline,
-        WorkInline,
-        InterestInline,
-        AffiliationInline
-    ]
+
     
-class ArtefactInline(admin.StackedInline):
+class ArtefactAdmin(admin.ModelAdmin):
     model = Artefact
-    extra = 0
+
     
 class ProductAdmin(admin.ModelAdmin):
     model = Product
-    inlines = [
-        ArtefactInline,
-    ]
 
 
 admin.site.register(Session, SessionAdmin)   
 
 admin.site.register(Tenant, TenantAdmin)
+admin.site.register(UserProfile, UserProfileAdmin)
 admin.site.register(Language, LanguageAdmin)
 admin.site.register(Country, CountryAdmin)
 admin.site.register(OnlineIdentityProvider, OnlineIdentityProviderAdmin)
 admin.site.register(OnlineIdentity, OnlineIdentityAdmin)
 admin.site.register(Person, PersonAdmin)
-admin.site.register(Representative, RepresentativeAdmin)
+admin.site.register(Address, AddressAdmin)
+admin.site.register(Phone, PhoneAdmin)
+admin.site.register(Email, EmailAdmin)
+admin.site.register(Fax, FaxAdmin)
+admin.site.register(Representation, RepresentationAdmin)
 admin.site.register(Portfolio, PortfolioAdmin)
+admin.site.register(Education, EducationAdmin)
+admin.site.register(Work, WorkAdmin)
+admin.site.register(Interest, InterestAdmin)
+admin.site.register(Affiliation, AffiliationAdmin)
 admin.site.register(Product, ProductAdmin)
+admin.site.register(Artefact, ArtefactAdmin)
 
 

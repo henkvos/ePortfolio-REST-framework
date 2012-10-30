@@ -17,19 +17,7 @@ class PortfolioDetailView(DetailView):
     pass
 
 class EducationView(ListOrCreateView):
-    
-    def get(self, request, *args, **kwargs):
-        model = self.resource.model
-        print kwargs
-        pk = kwargs['guid']
-        portfolio = Portfolio.objects.get(pk=pk)
-        education = model.objects.filter(portfolio=portfolio)
-
-        return education
-    
-    
-        
-
+    pass
 
 class EducationDetailView(DetailView):
     pass

@@ -3,6 +3,7 @@ from auth.models import *
 
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
+from utils.fields import UUIDField
 
 class Language(models.Model):
     lcid = models.CharField(primary_key=True, max_length=5)
@@ -47,6 +48,7 @@ class Address(TenantModel):
         ('B', _('Business')),
         ('P', _('Private')),
     )
+    uuid = UUIDField(auto=True, primary_key=True, db_column='address_id')
     address_line = models.CharField(max_length=255)
     zipcode = models.CharField(max_length=64, null=True, blank=True)
     city = models.CharField(max_length=255)
